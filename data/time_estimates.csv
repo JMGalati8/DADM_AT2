@@ -1,0 +1,35 @@
+,task,implementor,min,ml,max
+1,Database design - Data Model,Data Engineer/Data Scientist,4,5,10
+2,Create data dictionary,Data Engineer/Data Scientist,4,5,10
+3,Data extraction and data cleaning from existing system,Data Engineer/Data Scientist,7,10,20
+4,Exploratory data analysis,Data Engineer/Data Scientist,15,30,35
+5,Feature engineering,Data Engineer/Data Scientist,10,15,30
+6,Develop models for predicting likely encodings,Data Engineer/Data Scientist,15,30,35
+7,Develop pipeline to update models,Data Engineer/Data Scientist,5,10,12
+8,Evaluation of model,Data Engineer/Data Scientist,4,5,10
+9,Develop API for interacting with the trained model,Data Engineer/Data Scientist,5,10,12
+10,Data Infrastructure Documentation,Data Engineer/Data Scientist,7,10,20
+11,Database design - Application,Full Stack developer,4,5,10
+12,Develop Stub API for interacting with the trained model,Full Stack developer,0.5,0.5,0.5
+13,UI design,Full Stack developer,5,7,10
+14,UI implementation 1st sprint,Full Stack developer,25,20,30
+15,UI implementation 2nd sprint,Full Stack developer,3,5,10
+16,UI implementation 3rd sprint,Full Stack developer,3,5,10
+17,UI implementation 4th sprint,Full Stack developer,3,5,10
+18,Developing unit tests,Full Stack developer,2,10,15
+19,Developing test plan,Full Stack developer,3,5,10
+20,Run the test plan in development environment,Full Stack developer,4,5,7
+21,Post DEV environment testing reworks and modification,Full Stack developer,1,5,10
+22,Develop deployment scripts,Full Stack developer,1,2,5
+23,User training (train the trainer),Full Stack developer,2,3,5
+24,Round 1 - UAT environment deployment,Full Stack developer,0.5,1,2
+25,Round 1 - UAT environment testing,Full Stack developer,4,5,7
+26,Post UAT reworks and modification,Full Stack developer,1,5,10
+27,Round 2 - UAT environment deployment,Full Stack developer,0.5,1,2
+28,Round 2 - UAT environment testing,Full Stack developer,4,5,7
+29,Production environment deployment,Full Stack developer,0.5,1,2
+30,Production pilot of application with limited user base,Full Stack developer,5,10,15
+31,Post pilot reworks and modification,Full Stack developer,1,5,10
+32,Final production deployment,Full Stack developer,0.5,1,2
+33,Meetings,Full Stack developer,3,5,15
+34,Application Documentation,Full Stack developer,10,20,30
