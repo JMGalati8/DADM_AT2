@@ -1,0 +1,174 @@
+---
+title: "What Comes Next Monte Carlo Simulation on Estimates"
+author: "Michael Gordon"
+date: "29/09/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+library(gridExtra)
+
+theme_set(theme_bw())
+theme_update( plot.title = element_text(hjust=0.5)
+            , plot.subtitle = element_text(hjust=0.5)
+            )
+
+estimates <- read_csv('Data/estimates_task_estimates.csv')
+salaries <- read_csv('Data/estimates_salaries.csv')
+
+# PERT estimator courtesy of https://www.riskamp.com/beta-pert
+pert_dist_estimator <- function( n, x.min, x.max, x.mode, lambda = 4 ){
+
+    if( x.min > x.max || x.mode > x.max || x.mode < x.min ) stop( "invalid parameters" );
+
+    x.range <- x.max - x.min;
+    if( x.range == 0 ) return( rep( x.min, n ));
+
+    mu <- ( x.min + x.max + lambda * x.mode ) / ( lambda + 2 );
+
+    # special case if mu == mode
+    if( mu == x.mode ){
+        v <- ( lambda / 2 ) + 1
+    }
+    else {
+        v <- (( mu - x.min ) * ( 2 * x.mode - x.min - x.max )) /
+            (( x.mode - mu ) * ( x.max - x.min ));
+    }
+
+    w <- ( v * ( x.max - mu )) / ( mu - x.min );
+    return ( rbeta( n, v, w ) * x.range + x.min );
+}
+```
+
+
+```{r}
+n <- 10000
+set.seed(42)
+data_engineer_estimates <- estimates %>% filter(Implementor == 'Data Engineer/Data Scientist' & Type != 'Documentation')
+full_stack_estimates <- estimates %>% filter(Implementor == 'Full Stack developer' & Type != 'Documentation')
+
+data_engineer_documentation_estimates <- estimates %>% filter(Implementor == 'Data Engineer/Data Scientist' & Type == 'Documentation')
+full_stack_documentation_estimates <- estimates %>% filter(Implementor == 'Full Stack developer' & Type == 'Documentation')
+
+monte_carlo_model <- function(data_df){
+  simulation_results_df <- as.data.frame(matrix(nrow=n,ncol=nrow(data_df)))
+  
+  for(i in 1:nrow(data_df)){
+    results = pert_dist_estimator(n, data_df$Minimum[i], data_df$Maximum[i], data_df$MostLikely[i])
+    simulation_results_df[,i] <- results
+  }
+  
+  return(simulation_results_df)
+}
+
+data_engineer_simulations <- monte_carlo_model(data_engineer_estimates)
+full_stack_simulations <- monte_carlo_model(full_stack_estimates)
+data_engineer_documentation_simulations <- monte_carlo_model(data_engineer_documentation_estimates)
+full_stack_documentation_simulations <- monte_carlo_model(full_stack_documentation_estimates)
+
+sim_sum <- function(data_df){
+  result <- rep(0, nrow(data_df))
+  for(i in 1:ncol(data_df)){
+    result = result + data_df[,i]
+  }
+  return(result)
+}
+
+data_engineer_total_dev_time <- data.frame(time = sim_sum(data_engineer_simulations))
+data_engineer_total_doc_time <- data.frame(time = sim_sum(data_engineer_documentation_simulations))
+full_stack_total_dev_time <- data.frame(time = sim_sum(full_stack_simulations))
+full_stack_total_doc_time <- data.frame(time = sim_sum(full_stack_documentation_simulations))
+```
+
+```{r, fig.width=10}
+plot_simulation <- function(simulation_times, bin_size, lower_bound_point = .05, upper_bound_point = .95){
+  
+  e = ecdf(simulation_times$time)
+  upper_x_point <- quantile(e,c(upper_bound_point),type=7)
+  lower_x_point <- quantile(e,c(lower_bound_point),type=7)
+  
+  grid.arrange(
+    ggplot(simulation_times, aes(x = time)) + 
+      geom_histogram(aes(y=..density..),      
+                     binwidth=bin_size,
+                     colour="black", fill="white") +
+      geom_vline(aes(xintercept = lower_x_point), linetype="dotted", color = "red") +
+      geom_vline(aes(xintercept = upper_x_point), linetype="dotted", color = "red") +
+      scale_y_continuous(labels = scales::comma) +
+      xlab("Completed on day") +
+      geom_density(alpha=.2, fill="#FF6666") +
+      ggtitle("Probability Distribution Curve")
+    
+    ,ggplot(simulation_times, aes(time)) +
+      stat_ecdf(geom = 'line') +
+
+      geom_point(aes(y = upper_bound_point, x = upper_x_point), colour = 'red') +
+      geom_point(aes(y = lower_bound_point, x = lower_x_point), colour = 'red') +
+      
+      scale_y_continuous(labels = scales::percent, name = "Probability") +
+      xlab("Completed by day") +
+      ggtitle("Cumulative Probability Distribution Curve")
+    , ncol = 2
+  )
+}
+```
+
+### Data Medeling/Engineering development time in days
+
+```{r, fig.width=10}
+plot_simulation(data_engineer_total_dev_time, 1)
+```
+
+```{r}
+quantile(data_engineer_total_dev_time$time,c(0.05,0.95),type=7)
+```
+
+### Data Medeling/Engineering documentation time in days
+
+```{r, fig.width=10}
+plot_simulation(data_engineer_total_doc_time, 1)
+```
+
+```{r}
+quantile(data_engineer_total_doc_time$time,c(0.05,0.95),type=7)
+```
+
+### Application Development time in days
+
+```{r, fig.width=10}
+plot_simulation(full_stack_total_dev_time, 1)
+```
+
+```{r}
+quantile(full_stack_total_dev_time$time,c(0.05,0.95),type=7)
+```
+
+### Application Documentation time in days
+
+```{r, fig.width=10}
+plot_simulation(full_stack_total_doc_time, 1)
+```
+
+```{r}
+quantile(full_stack_total_doc_time$time,c(0.05,0.95),type=7)
+```
+
+### Total project time in days
+
+We are planing for the application development and data engineering/machine learning work to be done in parallel, for elements of the application development which are dependent on the NLP model a stub web service will be developed which will return dummy results.
+
+```{r, fig.width=10}
+full_stack_total_time <- data.frame(time = full_stack_total_doc_time$time + full_stack_total_dev_time$time)
+data_engineer_total_time <- data.frame(time = data_engineer_total_doc_time$time + data_engineer_total_dev_time$time)
+
+total_time <- data.frame(time = pmax(full_stack_total_time$time, data_engineer_total_time$time))
+plot_simulation(total_time, 1)
+```
+
+```{r}
+quantile(total_time$time,c(0.05,0.95),type=7)
+```
+
