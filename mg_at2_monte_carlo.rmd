@@ -5,6 +5,10 @@ date: "29/09/2020"
 output: html_document
 ---
 
+Using the three point estimates provided to us by our team of experts we have used the beta-PERT distribution to generate simulations of the project tasks, we are assuming that the estimates provided are fairly accurate which is why we have chosen the beta-PERT distribution as it more closely resembles a normal distribution and places more emphasis around the “most likely” value, we have configured the lambda parameter with the default value of 4 to maintain a close resemblance to a normal distribution (RiskAMP 2020).
+
+The beta-PERT Distribution | RiskAMP (2020). Available at: https://www.riskamp.com/beta-pert (Accessed: 30 September 2020).
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
@@ -16,8 +20,8 @@ theme_update( plot.title = element_text(hjust=0.5)
             , plot.subtitle = element_text(hjust=0.5)
             )
 
-estimates <- read_csv('Data/estimates_task_estimates.csv')
-salaries <- read_csv('Data/estimates_salaries.csv')
+estimates <- read_csv('data/estimates_task_estimates.csv')
+salaries <- read_csv('data/estimates_salaries.csv')
 
 # PERT estimator courtesy of https://www.riskamp.com/beta-pert
 pert_dist_estimator <- function( n, x.min, x.max, x.mode, lambda = 4 ){
@@ -116,7 +120,7 @@ plot_simulation <- function(simulation_times, bin_size, lower_bound_point = .05,
 }
 ```
 
-### Data Medeling/Engineering development time in days
+### Data Modelling/Engineering development time in days
 
 ```{r, fig.width=10}
 plot_simulation(data_engineer_total_dev_time, 1)
@@ -126,7 +130,7 @@ plot_simulation(data_engineer_total_dev_time, 1)
 quantile(data_engineer_total_dev_time$time,c(0.05,0.95),type=7)
 ```
 
-### Data Medeling/Engineering documentation time in days
+### Data Medelling/Engineering documentation time in days
 
 ```{r, fig.width=10}
 plot_simulation(data_engineer_total_doc_time, 1)
@@ -158,7 +162,7 @@ quantile(full_stack_total_doc_time$time,c(0.05,0.95),type=7)
 
 ### Total project time in days
 
-We are planing for the application development and data engineering/machine learning work to be done in parallel, for elements of the application development which are dependent on the NLP model a stub web service will be developed which will return dummy results.
+We are planning for the application development and data engineering/machine learning work to be done in parallel, for elements of the application development which are dependent on the NLP model a stub web service will be developed which will return dummy results.
 
 ```{r, fig.width=10}
 full_stack_total_time <- data.frame(time = full_stack_total_doc_time$time + full_stack_total_dev_time$time)
