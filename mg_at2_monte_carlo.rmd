@@ -21,7 +21,7 @@ theme_update( plot.title = element_text(hjust=0.5)
             )
 
 estimates <- read_csv('data/estimates_task_estimates.csv')
-salaries <- read_csv('data/estimates_salaries.csv')
+salaries <- read_csv('data/estimates_salaries_2.csv')
 
 # PERT estimator courtesy of https://www.riskamp.com/beta-pert
 pert_dist_estimator <- function( n, x.min, x.max, x.mode, lambda = 4 ){
@@ -88,7 +88,7 @@ full_stack_total_doc_time <- data.frame(time = sim_sum(full_stack_documentation_
 ```
 
 ```{r, fig.width=10}
-plot_simulation <- function(simulation_times, bin_size, lower_bound_point = .05, upper_bound_point = .95){
+plot_simulation <- function(simulation_times, bin_size, x_labels = c("Completed on day", "Completed by day"), lower_bound_point = .05, upper_bound_point = .95){
   
   e = ecdf(simulation_times$time)
   upper_x_point <- quantile(e,c(upper_bound_point),type=7)
@@ -102,7 +102,8 @@ plot_simulation <- function(simulation_times, bin_size, lower_bound_point = .05,
       geom_vline(aes(xintercept = lower_x_point), linetype="dotted", color = "red") +
       geom_vline(aes(xintercept = upper_x_point), linetype="dotted", color = "red") +
       scale_y_continuous(labels = scales::comma) +
-      xlab("Completed on day") +
+      scale_x_continuous(labels = scales::comma) +
+      xlab(x_labels[1]) +
       geom_density(alpha=.2, fill="#FF6666") +
       ggtitle("Probability Distribution Curve")
     
@@ -113,7 +114,8 @@ plot_simulation <- function(simulation_times, bin_size, lower_bound_point = .05,
       geom_point(aes(y = lower_bound_point, x = lower_x_point), colour = 'red') +
       
       scale_y_continuous(labels = scales::percent, name = "Probability") +
-      xlab("Completed by day") +
+      scale_x_continuous(labels = scales::comma) +
+      xlab(x_labels[2]) +
       ggtitle("Cumulative Probability Distribution Curve")
     , ncol = 2
   )
@@ -168,11 +170,78 @@ We are planning for the application development and data engineering/machine lea
 full_stack_total_time <- data.frame(time = full_stack_total_doc_time$time + full_stack_total_dev_time$time)
 data_engineer_total_time <- data.frame(time = data_engineer_total_doc_time$time + data_engineer_total_dev_time$time)
 
-total_time <- data.frame(time = pmax(full_stack_total_time$time, data_engineer_total_time$time))
-plot_simulation(total_time, 1)
+total_duration <- data.frame(time = pmax(full_stack_total_time$time, data_engineer_total_time$time))
+plot_simulation(total_duration, 1)
 ```
 
 ```{r}
-quantile(total_time$time,c(0.05,0.95),type=7)
+quantile(total_duration$time,c(0.05,0.95),type=7)
 ```
 
+### Salaries 
+
+We have salary estimates for junior, senior and lead data scientist/data engineer for the ETL, ML and NLP work, and full stack developer for the the application development work, we will use these estimates to perform a monte carlo simulation, and adjust for anticipated efficiency of each skill level. Based on this simulation we are 90% confident that the development effort will cost between 45,000 & 73,000.
+
+```{r}
+
+efficiency <- c(
+  c(0.45,0.95),
+  c(0.15,0.65),
+  c(0.05,0.55)
+)
+
+# our salary estimates are annual, but our time estimates are in days, so we need to convert
+# the salaries to daily rates, salary conversion formula: https://staff.uow.edu.au/personnel/salary/UOW020681.html
+days = 260.893
+salary_full_stack <- c(
+  (salaries %>% filter(Type == 'Full Stack developer') %>% select(Junior))[[1]] / days,
+  (salaries %>% filter(Type == 'Full Stack developer') %>% select(Senior))[[1]] / days,
+  (salaries %>% filter(Type == 'Full Stack developer') %>% select(Lead))[[1]] / days
+)
+
+salary_data_engineer <- c(
+  (salaries %>% filter(Type == 'Data Engineer/Data Scientist') %>% select(Junior))[[1]] / days,
+  (salaries %>% filter(Type == 'Data Engineer/Data Scientist') %>% select(Senior))[[1]] / days,
+  (salaries %>% filter(Type == 'Data Engineer/Data Scientist') %>% select(Lead))[[1]] / days
+)
+
+simulate_cost <- function(salary, simulations){
+  cost_estimates <- data.frame(
+    sim_id = numeric(),
+    cost = numeric()
+  )
+  
+  set.seed(42)
+  for(si in 1:n){
+    costs = numeric(ncol(simulations))
+    for(i in 1:ncol(simulations)){
+      
+      level <- sample.int(3, 1, replace = T)
+      adjusted_sim <- quantile(simulations[,i],efficiency[level],type=7)
+      
+      costs[i] <- sample(adjusted_sim, 1) * salary[level]
+    }
+    
+    cost_estimates <- cost_estimates %>% union(
+      data.frame(sim_id = si, cost = sum(costs))
+    )
+  }
+  return(cost_estimates)
+}
+
+cost_estimates_full_stack <- simulate_cost(salary_full_stack, full_stack_simulations)
+cost_estimates_data_engineer <- simulate_cost(salary_data_engineer, data_engineer_simulations)
+```
+
+#### Total Cost of development based on time and salary estimates
+
+```{r, fig.width=10}
+
+total_costs <- data.frame(time = cost_estimates_data_engineer$cost + cost_estimates_full_stack$cost)
+
+plot_simulation(total_costs, 500, c("Total Cost", "Total Cost"))
+```
+
+```{r}
+quantile(total_costs$time,c(0.05,0.95),type=7)
+```
