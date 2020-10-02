@@ -1,9 +1,9 @@
 ,Task,Implementor,Type,Minimum,MostLikely,Maximum
-1,Database design - Data Model,Data Engineer/Data Scientist,Development,4,5,10
-2,Create data dictionary,Data Engineer/Data Scientist,Documentation,4,5,10
-3,Data extraction and data cleaning from existing system,Data Engineer/Data Scientist,Development,7,10,20
+1,Database design - Data Model,Data Engineer/Data Scientist,Development,4,10,15
+2,Create data dictionary,Data Engineer/Data Scientist,Documentation,4,10,15
+3,Data extraction and data cleaning from existing system,Data Engineer/Data Scientist,Development,7,15,30
 4,Exploratory data analysis,Data Engineer/Data Scientist,Development,15,30,35
-5,Feature engineering,Data Engineer/Data Scientist,Development,10,15,30
+5,Feature engineering,Data Engineer/Data Scientist,Development,15,30,35
 6,Develop models for predicting likely encodings,Data Engineer/Data Scientist,Development,15,30,35
 7,Develop pipeline to update models,Data Engineer/Data Scientist,Development,5,10,12
 8,Evaluation of model,Data Engineer/Data Scientist,Development,4,5,10
@@ -11,27 +11,37 @@
 10,Data Infrastructure Documentation,Data Engineer/Data Scientist,Documentation,7,10,20
 11,Meetings,Data Engineer/Data Scientist,Meeting,3,5,15
 12,Database design - Application,Full Stack developer,Development,4,5,10
-13,Develop Stub API for interacting with the trained model,Full Stack developer,Development,0.5,0.5,0.5
-14,UI design,Full Stack developer,Development,5,7,10
-15,UI implementation 1st sprint,Full Stack developer,Development,20,25,30
-16,UI implementation 2nd sprint,Full Stack developer,Development,3,5,10
-17,UI implementation 3rd sprint,Full Stack developer,Development,3,5,10
-18,UI implementation 4th sprint,Full Stack developer,Development,3,5,10
-19,Developing unit tests,Full Stack developer,Development,2,10,15
-20,Developing test plan,Full Stack developer,Documentation,3,5,10
-21,Run the test plan in development environment,Full Stack developer,Testing,4,5,7
-22,Post DEV environment testing reworks and modification,Full Stack developer,Development,1,5,10
-23,Develop deployment scripts,Full Stack developer,Development,1,2,5
-24,User training (train the trainer),Full Stack developer,Training,2,3,5
-25,Round 1 - UAT environment deployment,Full Stack developer,Deployment,0.5,1,2
-26,Round 1 - UAT environment testing,Full Stack developer,Testing,4,5,7
-27,Post UAT reworks and modification,Full Stack developer,Development,1,5,10
-28,Round 2 - UAT environment deployment,Full Stack developer,Deployment,0.5,1,2
-29,Round 2 - UAT environment testing,Full Stack developer,Testing,4,5,7
-30,Production environment deployment,Full Stack developer,Deployment,0.5,1,2
-31,Production pilot of application with limited user base,Full Stack developer,Testing,5,10,15
-32,Post pilot reworks and modification,Full Stack developer,Development,1,5,10
-33,Final production deployment,Full Stack developer,Deployment,0.5,1,2
-34,Meetings,Full Stack developer,Meeting,3,5,15
-35,Application Documentation,Full Stack developer,Documentation,10,20,30
-36,User guides and training material,Full Stack developer,Documentation,10,20,30
+13,Develop Stub API for interacting with the trained model,Full Stack developer,Development,1,2,5
+14,Design workshop with stakeholders,Full Stack developer,Development,1,2,3
+15,UI design,Full Stack developer,Development,5,7,10
+16,UI implementation 1st sprint,Full Stack developer,Development,20,30,40
+17,UI implementation 1st sprint (Review with stakeholders),Full Stack developer,Development,1,2,3
+18,UI implementation 2nd sprint,Full Stack developer,Development,6,10,20
+19,UI implementation 2nd sprint (Review with stakeholders),Full Stack developer,Development,1,2,3
+20,UI implementation 3rd sprint,Full Stack developer,Development,6,10,20
+21,UI implementation 3rd sprint (Review with stakeholders),Full Stack developer,Development,1,2,3
+22,UI implementation 4th sprint,Full Stack developer,Development,6,10,20
+23,UI implementation 4th sprint (Review with stakeholders),Full Stack developer,Development,1,2,3
+24,Replace Stub web service with live predictive models API service,Full Stack developer,Development,3,5,20
+25,Developing unit tests,Full Stack developer,Development,15,30,60
+26,Developing test plan,Full Stack developer,Documentation,10,15,30
+27,1st Run the test plan in development environment,Full Stack developer,Testing,5,10,30
+28,1st Post DEV environment testing reworks and modification,Full Stack developer,Development,5,10,20
+29,1st Run the test plan in development environment,Full Stack developer,Testing,5,10,30
+30,1st Post DEV environment testing reworks and modification,Full Stack developer,Development,5,10,20
+31,Develop deployment scripts,Full Stack developer,Development,3,5,15
+32,User training (train the trainer),Full Stack developer,Training,5,10,20
+33,Round 1 - UAT environment deployment,Full Stack developer,Deployment,0.5,1,2
+34,Round 1 - UAT environment testing,Full Stack developer,Testing,4,5,7
+35,Round 1 - UAT Review with stakeholder,Full Stack developer,Deployment,1,2,5
+36,Post UAT reworks and modification,Full Stack developer,Development,1,5,10
+37,Round 2 - UAT environment deployment,Full Stack developer,Deployment,0.5,1,2
+38,Round 2 - UAT environment testing,Full Stack developer,Testing,4,5,7
+39,Round 2 - UAT Review with stakeholder,Full Stack developer,Deployment,1,2,5
+40,Production environment deployment,Full Stack developer,Deployment,0.5,1,2
+41,Production pilot of application with limited user base,Full Stack developer,Testing,5,10,15
+42,Post pilot reworks and modification,Full Stack developer,Development,1,5,10
+43,Final production deployment,Full Stack developer,Deployment,0.5,1,2
+44,Meetings,Full Stack developer,Meeting,3,5,15
+45,Application Documentation,Full Stack developer,Documentation,10,20,30
+46,User guides and training material,Full Stack developer,Documentation,10,20,30
