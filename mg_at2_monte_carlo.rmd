@@ -180,7 +180,7 @@ quantile(total_duration$time,c(0.05,0.95),type=7)
 
 ### Salaries 
 
-We have salary estimates for junior, senior and lead data scientist/data engineer for the ETL, ML and NLP work, and full stack developer for the the application development work, we will use these estimates to perform a monte carlo simulation, and adjust for anticipated efficiency of each skill level. Based on this simulation we are 90% confident that the development effort will cost between 45,000 & 73,000.
+We have salary estimates for junior, senior and lead data scientist/data engineer for the ETL, ML and NLP work, and full stack developer for the the application development work, we will use these estimates to perform a monte carlo simulation, and adjust for anticipated efficiency of each skill level. Based on this simulation we are 90% confident that the development effort will cost between 96,000 and 148,000.
 
 ```{r}
 
@@ -194,15 +194,15 @@ efficiency <- c(
 # the salaries to daily rates, salary conversion formula: https://staff.uow.edu.au/personnel/salary/UOW020681.html
 days = 260.893
 salary_full_stack <- c(
-  (salaries %>% filter(Type == 'Full Stack developer') %>% select(Junior))[[1]] / days,
-  (salaries %>% filter(Type == 'Full Stack developer') %>% select(Senior))[[1]] / days,
-  (salaries %>% filter(Type == 'Full Stack developer') %>% select(Lead))[[1]] / days
+  (salaries %>% filter(Type == 'Full Stack developer') %>% select(Junior_Gross_Salary))[[1]] / days,
+  (salaries %>% filter(Type == 'Full Stack developer') %>% select(Senior_Gross_Salary))[[1]] / days,
+  (salaries %>% filter(Type == 'Full Stack developer') %>% select(Lead_Gross_Salary))[[1]] / days
 )
 
 salary_data_engineer <- c(
-  (salaries %>% filter(Type == 'Data Engineer/Data Scientist') %>% select(Junior))[[1]] / days,
-  (salaries %>% filter(Type == 'Data Engineer/Data Scientist') %>% select(Senior))[[1]] / days,
-  (salaries %>% filter(Type == 'Data Engineer/Data Scientist') %>% select(Lead))[[1]] / days
+  (salaries %>% filter(Type == 'Data Engineer/Data Scientist') %>% select(Junior_Gross_Salary))[[1]] / days,
+  (salaries %>% filter(Type == 'Data Engineer/Data Scientist') %>% select(Senior_Gross_Salary))[[1]] / days,
+  (salaries %>% filter(Type == 'Data Engineer/Data Scientist') %>% select(Lead_Gross_Salary))[[1]] / days
 )
 
 simulate_cost <- function(salary, simulations){
