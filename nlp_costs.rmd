@@ -1,0 +1,117 @@
+---
+title: "NLP Costs"
+author: "Roger Yu"
+date: "02/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(Hmisc)
+library(mc2d)
+library(tidyverse)
+library(skimr)
+library(gridExtra)
+
+theme_set(theme_bw())
+theme_update( plot.title = element_text(hjust=0.5)
+            , plot.subtitle = element_text(hjust=0.5)
+            )
+
+rm(list=ls())
+# The script is to be saved in the src directory
+# The project directory is one  level above the src directory
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+set.seed(42)
+n <- 10000
+lambda <- 4
+price_per_unit <- 0.0007
+characters_per_unit <- 100
+character_estimates <- read_csv('data/nlp_estimates.csv')
+
+# Characters for NLP
+min_nlp <- character_estimates %>% 
+  filter(item == "characters") %>% 
+  select(min) %>% 
+  pull()
+ml_nlp <- character_estimates %>% 
+  filter(item == "characters") %>% 
+  select(ml) %>% 
+  pull()
+max_nlp <- character_estimates %>% 
+  filter(item == "characters") %>% 
+  select(max) %>% 
+  pull()
+
+characters <- rpert(n, min_nlp, ml_nlp, max_nlp, shape=lambda)
+
+# Number of Patients
+min_patients <- character_estimates %>% 
+  filter(item == "patients") %>% 
+  select(min) %>% 
+  pull()
+ml_patients <- character_estimates %>% 
+  filter(item == "patients") %>% 
+  select(ml) %>% 
+  pull()
+max_patients <- character_estimates %>% 
+  filter(item == "patients") %>% 
+  select(max) %>% 
+  pull()
+
+patients <- rpert(n, min_patients, ml_patients, max_patients, shape=lambda)
+
+total <- patients * characters
+cost <- total / characters_per_unit * price_per_unit * 365
+```
+
+```{r}
+plot <- tibble(patients) %>% 
+  ggplot(aes(x=patients)) +
+  geom_histogram() +
+  ggtitle('Total patients admitted to the LHD per year') +
+  geom_vline(xintercept = quantile(cost, 0.05, 7), color = 'red') +
+  geom_vline(xintercept = quantile(cost, 0.95, 7), color = 'red')
+
+print(plot)
+quantile(patients, c(0.05, 0.95), 7)
+```
+
+```{r}
+plot <- tibble(characters) %>% 
+  ggplot(aes(x=patients)) +
+  geom_histogram() +
+  ggtitle('Number of characters of eMR per patient per day') +
+  geom_vline(xintercept = quantile(cost, 0.05, 7), color = 'red') +
+  geom_vline(xintercept = quantile(cost, 0.95, 7), color = 'red')
+
+print(plot)
+quantile(characters, c(0.05, 0.95), 7)
+```
+
+```{r}
+plot <- tibble(cost) %>% 
+  ggplot(aes(x=cost)) +
+  geom_histogram() +
+  ggtitle('Total cost for AWS Comprehend Medical per year') +
+  geom_vline(xintercept = quantile(cost, 0.05, 7), color = 'red') +
+  geom_vline(xintercept = quantile(cost, 0.95, 7), color = 'red')
+
+print(plot)
+quantile(cost, c(0.05, 0.95), 7)
+```
+
+```{r}
+cost %>% tibble() %>% 
+  ggplot(aes(x=cost)) +
+  stat_ecdf(geom = 'line') +
+  ggtitle('ECDF of AWS Comprehend Medical per year')
+```
+
+```{r}
+quantile(cost, c(0.05,0.95),type=7)
+```
+
